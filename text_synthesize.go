@@ -2,8 +2,9 @@ package tts_integration
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 )
 
@@ -13,6 +14,10 @@ const (
 
 type TextSynthesizeResponse struct {
 	AudioContent string `json:"audioContent"`
+}
+
+func (tsr *TextSynthesizeResponse) Bytes() ([]byte, error) {
+	return base64.StdEncoding.DecodeString(tsr.AudioContent)
 }
 
 func PostTextSynthesize(hc *http.Client, txt string, voice *VoiceSelectionParams, key string) (*TextSynthesizeResponse, error) {
@@ -25,13 +30,15 @@ func PostTextSynthesize(hc *http.Client, txt string, voice *VoiceSelectionParams
 		return nil, err
 	}
 
-	fmt.Printf(string(req))
-
 	resp, err := hc.Post(tsu.String(), jsonContentType, bytes.NewReader(req))
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return nil, errors.New("text:synthesize error status " + resp.Status)
+	}
 
 	var tsr *TextSynthesizeResponse
 	err = json.NewDecoder(resp.Body).Decode(&tsr)
