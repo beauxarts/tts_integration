@@ -16,7 +16,7 @@ type VoicesResp struct {
 
 func GetVoices(hc *http.Client, lc, key string) (*VoicesResp, error) {
 
-	vu := VoicesUrl("ru", key)
+	vu := VoicesUrl(lc, key)
 
 	resp, err := hc.Get(vu.String())
 	if err != nil {

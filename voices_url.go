@@ -22,7 +22,6 @@ func VoicesUrl(lc, key string) *url.URL {
 	q := u.Query()
 	q.Set(languageCodeParam, lc)
 	q.Set(keyParam, key)
-
 	u.RawQuery = q.Encode()
 
 	return u
