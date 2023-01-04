@@ -1,3 +1,3 @@
-module github.com/beauxarts/google-tts-integration
+module github.com/beauxarts/google_tts_integration
 
 go 1.19

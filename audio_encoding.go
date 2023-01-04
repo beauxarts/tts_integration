@@ -1,4 +1,4 @@
-package tts_integration
+package google_tts_integration
 
 type AudioEncoding string
 

@@ -1,4 +1,4 @@
-package tts_integration
+package google_tts_integration
 
 type SynthesisInput struct {
 	Text string `json:"text,omitempty"`
