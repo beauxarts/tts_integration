@@ -1,5 +1,7 @@
 package google_tts_integration
 
+import "strings"
+
 type VoiceGender string
 
 const (
@@ -12,3 +14,15 @@ const (
 	//Neutral - A gender-neutral voice. This voice is not yet supported.
 	Neutral = "NEUTRAL"
 )
+
+func ParseVoiceGender(gr string) VoiceGender {
+	switch strings.ToLower(gr) {
+	case strings.ToLower(Male):
+		return Male
+	case strings.ToLower(Female):
+		return Female
+	case strings.ToLower(Neutral):
+		return Neutral
+	}
+	return VoiceGenderUnspecified
+}

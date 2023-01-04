@@ -6,10 +6,10 @@ type VoiceSelectionParams struct {
 	Gender       VoiceGender `json:"ssmlGender"`
 }
 
-func NewVoiceSelectionParams(lc, nm string, gr VoiceGender) *VoiceSelectionParams {
+func NewVoice(lc, nm, gr string) *VoiceSelectionParams {
 	return &VoiceSelectionParams{
 		LanguageCode: lc,
 		Name:         nm,
-		Gender:       gr,
+		Gender:       ParseVoiceGender(gr),
 	}
 }
