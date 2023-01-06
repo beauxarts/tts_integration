@@ -24,3 +24,5 @@ func NewDefaultAudioConfig() *AudioConfig {
 		EffectsProfileId: []AudioProfile{HeadphoneClassDevice},
 	}
 }
+
+const DefaultEncodingExt = ".ogg"
