@@ -32,7 +32,7 @@ func NewSynthesizer(voice, audioFormat string) tts_integration.Synthesizer {
 
 func (s *Synthesizer) WriteText(text string, _ io.Writer, name string) error {
 
-	args := []string{"-v", s.voice, "-o", name, "--file-format", s.audioFormat.String(), text}
+	args := []string{"-v", s.voice, "-o", name, "--file-format", s.audioFormat.String(), "--data-format", "aac", text}
 	cmd := exec.Command(s.sayCmd, args...)
 
 	if err := cmd.Run(); err != nil {
