@@ -37,20 +37,20 @@ func NewSynthesizer(hc *http.Client, key string, voiceParams ...string) tts_inte
 }
 
 func (s *Synthesizer) postText(text string) (*textSynthesizeResponse, error) {
-	return s.postSynthesizeRequest(text, Text)
+	return s.postSynthesizeRequest(text, tts_integration.Text)
 }
 
 func (s *Synthesizer) postSSML(ssml string) (*textSynthesizeResponse, error) {
-	return s.postSynthesizeRequest(ssml, SSML)
+	return s.postSynthesizeRequest(ssml, tts_integration.SSML)
 }
 
-func (s *Synthesizer) postSynthesizeRequest(content string, contentType SynthesisInputType) (*textSynthesizeResponse, error) {
+func (s *Synthesizer) postSynthesizeRequest(content string, contentType tts_integration.SynthesisInputType) (*textSynthesizeResponse, error) {
 
 	var newRequest func(string, *VoiceSelectionParams) *SynthesizeRequest
 	switch contentType {
-	case Text:
+	case tts_integration.Text:
 		newRequest = NewTextSynthesizeRequest
-	case SSML:
+	case tts_integration.SSML:
 		newRequest = NewSSMLSynthesizeRequest
 	}
 
@@ -88,13 +88,13 @@ func (s *Synthesizer) postSynthesizeRequest(content string, contentType Synthesi
 	return tsr, err
 }
 
-func (s *Synthesizer) synthesize(content string, contentType SynthesisInputType, w io.Writer) error {
+func (s *Synthesizer) synthesize(content string, contentType tts_integration.SynthesisInputType, w io.Writer) error {
 
 	var post func(string) (*textSynthesizeResponse, error)
 	switch contentType {
-	case Text:
+	case tts_integration.Text:
 		post = s.postText
-	case SSML:
+	case tts_integration.SSML:
 		post = s.postSSML
 	}
 
@@ -118,11 +118,11 @@ func (s *Synthesizer) synthesize(content string, contentType SynthesisInputType,
 }
 
 func (s *Synthesizer) WriteText(text string, w io.Writer, _ string) error {
-	return s.synthesize(text, Text, w)
+	return s.synthesize(text, tts_integration.Text, w)
 }
 
 func (s *Synthesizer) WriteSSML(ssml string, w io.Writer, _ string) error {
-	return s.synthesize(ssml, SSML, w)
+	return s.synthesize(ssml, tts_integration.SSML, w)
 }
 
 func (s *Synthesizer) VoicesStrings(params ...string) ([]string, error) {
