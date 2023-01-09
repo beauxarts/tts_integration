@@ -3,7 +3,10 @@ package tts_integration
 import "io"
 
 type Synthesizer interface {
-	SynthesizeText(t string, w io.Writer) error
-	SynthesizeSSML(s string, w io.Writer) error
+	IsSSMLSupported() bool
+	IsWriterRequired() bool
+	IsNameRequired() bool
 	VoicesStrings(params ...string) ([]string, error)
+	WriteText(t string, w io.Writer, n string) error
+	WriteSSML(s string, w io.Writer, n string) error
 }

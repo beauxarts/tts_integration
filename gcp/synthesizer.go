@@ -117,11 +117,11 @@ func (s *Synthesizer) synthesize(content string, contentType SynthesisInputType,
 	return err
 }
 
-func (s *Synthesizer) SynthesizeText(text string, w io.Writer) error {
+func (s *Synthesizer) WriteText(text string, w io.Writer, _ string) error {
 	return s.synthesize(text, Text, w)
 }
 
-func (s *Synthesizer) SynthesizeSSML(ssml string, w io.Writer) error {
+func (s *Synthesizer) WriteSSML(ssml string, w io.Writer, _ string) error {
 	return s.synthesize(ssml, SSML, w)
 }
 
@@ -142,4 +142,16 @@ func (s *Synthesizer) VoicesStrings(params ...string) ([]string, error) {
 	}
 
 	return voices, nil
+}
+
+func (s *Synthesizer) IsSSMLSupported() bool {
+	return true
+}
+
+func (s *Synthesizer) IsWriterRequired() bool {
+	return true
+}
+
+func (s *Synthesizer) IsNameRequired() bool {
+	return false
 }
