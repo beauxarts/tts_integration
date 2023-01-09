@@ -1,4 +1,4 @@
-package google_tts_integration
+package gcp
 
 type AudioProfile string
 

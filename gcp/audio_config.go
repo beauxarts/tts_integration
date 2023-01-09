@@ -1,4 +1,4 @@
-package google_tts_integration
+package gcp
 
 type AudioConfig struct {
 	//Encoding - Required. The format of the audio byte stream.
@@ -25,4 +25,4 @@ func NewDefaultAudioConfig() *AudioConfig {
 	}
 }
 
-const DefaultEncodingExt = ".ogg"
+const DefaultAudioEncodingExt = ".ogg"
