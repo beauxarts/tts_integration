@@ -1,6 +1,9 @@
 package tts_integration
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 type Synthesizer interface {
 	IsSSMLSupported() bool
@@ -9,4 +12,5 @@ type Synthesizer interface {
 	VoicesStrings(params ...string) ([]string, error)
 	WriteText(t string, w io.Writer, n string) error
 	WriteSSML(s string, w io.Writer, n string) error
+	Pause(d time.Duration) (string, SynthesisInputType)
 }

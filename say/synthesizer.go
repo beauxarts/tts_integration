@@ -2,10 +2,12 @@ package say
 
 import (
 	"errors"
+	"fmt"
 	"github.com/beauxarts/tts_integration"
 	"io"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type Synthesizer struct {
@@ -70,4 +72,9 @@ func (s *Synthesizer) IsWriterRequired() bool {
 
 func (s *Synthesizer) IsNameRequired() bool {
 	return true
+}
+
+func (s *Synthesizer) Pause(dur time.Duration) (string, tts_integration.SynthesisInputType) {
+	return fmt.Sprintf("[[slnc %d]]]", dur.Milliseconds()),
+		tts_integration.SSML
 }

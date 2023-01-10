@@ -5,9 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/beauxarts/tts_integration"
 	"io"
 	"net/http"
+	"time"
 )
 
 const (
@@ -154,4 +156,9 @@ func (s *Synthesizer) IsWriterRequired() bool {
 
 func (s *Synthesizer) IsNameRequired() bool {
 	return false
+}
+
+func (s *Synthesizer) Pause(dur time.Duration) (string, tts_integration.SynthesisInputType) {
+	return fmt.Sprintf("<speak><break time=\"%ss\"/></speak>", dur.Seconds()),
+		tts_integration.SSML
 }
