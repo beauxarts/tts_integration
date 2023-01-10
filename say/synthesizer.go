@@ -75,6 +75,6 @@ func (s *Synthesizer) IsNameRequired() bool {
 }
 
 func (s *Synthesizer) Pause(dur time.Duration) (string, tts_integration.SynthesisInputType) {
-	return fmt.Sprintf("[[slnc %d]]]", dur.Milliseconds()),
+	return fmt.Sprintf("[[slnc %d]]", dur.Milliseconds()),
 		tts_integration.Text
 }
