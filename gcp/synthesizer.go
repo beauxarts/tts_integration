@@ -158,7 +158,8 @@ func (s *Synthesizer) IsNameRequired() bool {
 	return false
 }
 
-func (s *Synthesizer) Pause(dur time.Duration) (string, tts_integration.SynthesisInputType) {
-	return fmt.Sprintf("<speak><break time=\"%ss\"/></speak>", dur.Seconds()),
+func (s *Synthesizer) DecorateWithPauses(text string, dur time.Duration) (string, tts_integration.SynthesisInputType) {
+	sec := dur.Seconds()
+	return fmt.Sprintf("<speak><break time=\"%fs\"/>%s<break time=\"%fs\"/></speak>", sec, text, sec),
 		tts_integration.SSML
 }
