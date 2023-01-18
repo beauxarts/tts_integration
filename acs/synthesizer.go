@@ -5,6 +5,7 @@ import (
 	"github.com/beauxarts/tts_integration"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -39,6 +40,10 @@ func (s *Synthesizer) IsNameRequired() bool {
 }
 
 func (s *Synthesizer) VoicesStrings(params ...string) ([]string, error) {
+	locale := ""
+	if len(params) > 0 {
+		locale = params[0]
+	}
 
 	vlr, err := VoicesList(s.httpClient, s.region, s.key)
 	if err != nil {
@@ -48,7 +53,11 @@ func (s *Synthesizer) VoicesStrings(params ...string) ([]string, error) {
 	voices := make([]string, len(vlr))
 
 	for i, v := range vlr {
-		voices[i] = v.String()
+		vs := v.String()
+		if locale != "" && !strings.Contains(vs, locale) {
+			continue
+		}
+		voices[i] = vs
 	}
 
 	return voices, nil
