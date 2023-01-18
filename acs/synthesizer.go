@@ -53,11 +53,10 @@ func (s *Synthesizer) VoicesStrings(params ...string) ([]string, error) {
 	voices := make([]string, len(vlr))
 
 	for i, v := range vlr {
-		vs := v.String()
-		if locale != "" && !strings.Contains(vs, locale) {
+		if locale != "" && !strings.Contains(v.Locale, locale) {
 			continue
 		}
-		voices[i] = vs
+		voices[i] = v.String()
 	}
 
 	return voices, nil
