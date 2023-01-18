@@ -16,12 +16,12 @@ type AudioConfig struct {
 
 func NewDefaultAudioConfig() *AudioConfig {
 	return &AudioConfig{
-		Encoding:         OggOpus,
+		Encoding:         DefaultAudioEncoding,
 		SpeakingRate:     1.0,
 		Pitch:            0.0,
 		VolumeGainDb:     0.0,
 		SampleRateHertz:  0,
-		EffectsProfileId: []AudioProfile{HeadphoneClassDevice},
+		EffectsProfileId: []AudioProfile{DefaultAudioProfile},
 	}
 }
 

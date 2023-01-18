@@ -46,6 +46,7 @@ func (s *Synthesizer) postSSML(ssml string) (*textSynthesizeResponse, error) {
 	return s.postSynthesizeRequest(ssml, tts_integration.SSML)
 }
 
+// TODO: This needs to be reversed into a helper func that Synthesizer calls
 func (s *Synthesizer) postSynthesizeRequest(content string, contentType tts_integration.SynthesisInputType) (*textSynthesizeResponse, error) {
 
 	var newRequest func(string, *VoiceSelectionParams) *SynthesizeRequest
@@ -75,10 +76,10 @@ func (s *Synthesizer) postSynthesizeRequest(content string, contentType tts_inte
 	tsu := TextSynthesizeUrl(s.key)
 
 	resp, err := s.httpClient.Post(tsu.String(), jsonContentType, bytes.NewReader(req))
+	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return nil, errors.New("text:synthesize error status " + resp.Status)
