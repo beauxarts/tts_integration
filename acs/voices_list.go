@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 )
 
 type VoicesListResponse struct {
@@ -21,6 +22,10 @@ type VoicesListResponse struct {
 	StyleList           []string `json:"StyleList,omitempty"`
 	SecondaryLocaleList []string `json:"SecondaryLocaleList,omitempty"`
 	RolePlayList        []string `json:"RolePlayList,omitempty"`
+}
+
+func (vlr *VoicesListResponse) String() string {
+	return strings.Join([]string{vlr.Name, vlr.Locale, vlr.Gender}, " ")
 }
 
 func VoicesList(hc *http.Client, region, key string) ([]*VoicesListResponse, error) {

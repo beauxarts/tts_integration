@@ -20,6 +20,56 @@ type VoiceParams struct {
 	Text   string `xml:",chardata"`
 }
 
+func NewVoiceParams(params ...string) *VoiceParams {
+	var voiceName, voiceLang, voiceGender string
+	if len(params) > 0 {
+		voiceName = params[0]
+	}
+	if len(params) > 1 {
+		voiceLang = params[1]
+	}
+	if len(params) > 2 {
+		voiceGender = params[2]
+	}
+
+	return &VoiceParams{
+		Name:   voiceName,
+		Lang:   voiceLang,
+		Gender: voiceGender,
+	}
+}
+
+func (vp *VoiceParams) NewSpeakData(text string) *SpeakData {
+	vp.Text = text
+	return &SpeakData{
+		Version: ssmlVersion,
+		Lang:    vp.Lang,
+		Voice:   vp,
+	}
+}
+
+func (vp *VoiceParams) TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
+	speakData := vp.NewSpeakData(text)
+
+	data, err := xml.Marshal(speakData)
+	if err != nil {
+		return nil, err
+	}
+
+	return SsmlToSpeech(hc, data, audioOutput, region, key)
+}
+
+func (vp *VoiceParams) SsmlSnippetToSpeech(hc *http.Client, ssml string, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
+	speakData := vp.NewSpeakData(ssml)
+
+	data, err := xml.Marshal(speakData)
+	if err != nil {
+		return nil, err
+	}
+
+	return SsmlToSpeech(hc, data, audioOutput, region, key)
+}
+
 type SpeakData struct {
 	XMLName xml.Name     `xml:"speak"`
 	Version string       `xml:"version,attr"`
@@ -28,26 +78,14 @@ type SpeakData struct {
 }
 
 func NewSpeakData(text string, voiceParams ...string) *SpeakData {
-	var voiceName, voiceLang, voiceGender string
-	if len(voiceParams) > 0 {
-		voiceName = voiceParams[0]
-	}
-	if len(voiceParams) > 1 {
-		voiceLang = voiceParams[1]
-	}
-	if len(voiceParams) > 2 {
-		voiceGender = voiceParams[2]
-	}
+
+	vp := NewVoiceParams(voiceParams...)
+	vp.Text = text
 
 	return &SpeakData{
 		Version: ssmlVersion,
-		Lang:    voiceLang,
-		Voice: &VoiceParams{
-			Name:   voiceName,
-			Lang:   voiceLang,
-			Gender: voiceGender,
-			Text:   text,
-		},
+		Lang:    vp.Lang,
+		Voice:   vp,
 	}
 }
 
@@ -60,9 +98,13 @@ func TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region,
 		return nil, err
 	}
 
+	return SsmlToSpeech(hc, data, audioOutput, region, key)
+}
+
+func SsmlToSpeech(hc *http.Client, ssml []byte, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
 	ttsu := TextToSpeechUrl(region)
 
-	ttsReq, err := http.NewRequest(http.MethodPost, ttsu.String(), bytes.NewReader(data))
+	ttsReq, err := http.NewRequest(http.MethodPost, ttsu.String(), bytes.NewReader(ssml))
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +114,6 @@ func TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region,
 	ttsReq.Header.Add("Ocp-Apim-Subscription-Key", key)
 
 	resp, err := hc.Do(ttsReq)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
