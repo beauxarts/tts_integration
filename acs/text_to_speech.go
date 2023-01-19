@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -107,8 +106,6 @@ func TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region,
 
 func SsmlToSpeech(hc *http.Client, ssml []byte, audioOutput AudioOutput, region, token string) (io.ReadCloser, error) {
 	ttsu := TextToSpeechUrl(region)
-
-	fmt.Println(ttsu)
 
 	ttsReq, err := http.NewRequest(http.MethodPost, ttsu.String(), bytes.NewReader(ssml))
 	if err != nil {
