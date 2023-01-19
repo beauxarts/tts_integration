@@ -76,10 +76,10 @@ func (s *Synthesizer) postSynthesizeRequest(content string, contentType tts_inte
 	tsu := TextSynthesizeUrl(s.key)
 
 	resp, err := s.httpClient.Post(tsu.String(), jsonContentType, bytes.NewReader(req))
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return nil, errors.New("text:synthesize error status " + resp.Status)

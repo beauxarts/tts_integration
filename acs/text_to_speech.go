@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -60,12 +61,14 @@ func (vp *VoiceParams) TextToSpeech(hc *http.Client, text string, audioOutput Au
 }
 
 func (vp *VoiceParams) SsmlSnippetToSpeech(hc *http.Client, ssml string, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
-	speakData := vp.NewSpeakData(ssml)
+	speakData := vp.NewSpeakData("{ssml}")
 
 	data, err := xml.Marshal(speakData)
 	if err != nil {
 		return nil, err
 	}
+
+	data = []byte(strings.Replace(string(data), "{ssml}", ssml, -1))
 
 	return SsmlToSpeech(hc, data, audioOutput, region, key)
 }
@@ -111,7 +114,7 @@ func SsmlToSpeech(hc *http.Client, ssml []byte, audioOutput AudioOutput, region,
 
 	ttsReq.Header.Add("X-Microsoft-OutputFormat", audioOutput.String())
 	ttsReq.Header.Add("Content-Type", applicationSsmlXml)
-	ttsReq.Header.Add("Ocp-Apim-Subscription-Key", key)
+	ttsReq.Header.Add(OcpApimSubscriptionKeyHeader, key)
 
 	resp, err := hc.Do(ttsReq)
 	if err != nil {

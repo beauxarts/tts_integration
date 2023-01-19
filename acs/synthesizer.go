@@ -85,7 +85,7 @@ func (s *Synthesizer) WriteSSML(ssml string, w io.Writer, _ string) error {
 }
 
 func (s *Synthesizer) DecorateWithPauses(text string, d time.Duration) (string, tts_integration.SynthesisInputType) {
-	sec := d.Seconds()
-	return fmt.Sprintf("<break time=\"%.1fs\"/>%s<break time=\"%.1fs\"/>", sec, text, sec),
+	sec := int(d.Seconds())
+	return fmt.Sprintf("<break time=\"%ds\"/>%s<break time=\"%ds\"/>", sec, text, sec),
 		tts_integration.SSML
 }

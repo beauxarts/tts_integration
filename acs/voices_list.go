@@ -36,13 +36,13 @@ func VoicesList(hc *http.Client, region, key string) ([]*VoicesListResponse, err
 		return nil, err
 	}
 
-	voicesListReq.Header.Add("Ocp-Apim-Subscription-Key", key)
+	voicesListReq.Header.Add(OcpApimSubscriptionKeyHeader, key)
 
 	resp, err := hc.Do(voicesListReq)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return nil, errors.New(resp.Status)
