@@ -25,7 +25,7 @@ type VoicesListResponse struct {
 }
 
 func (vlr *VoicesListResponse) String() string {
-	return strings.Join([]string{vlr.ShortName, vlr.Locale, vlr.Gender}, " ")
+	return strings.Join([]string{vlr.ShortName, vlr.Locale, vlr.Gender}, ";")
 }
 
 func VoicesList(hc *http.Client, region, token string) ([]*VoicesListResponse, error) {

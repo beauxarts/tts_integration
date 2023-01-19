@@ -27,15 +27,22 @@ type VoicesResp struct {
 	Voices []VoiceResp `json:"voices"`
 }
 
-func GetVoices(hc *http.Client, lc, key string) (*VoicesResp, error) {
+func GetVoices(hc *http.Client, langCode, key string) (*VoicesResp, error) {
 
-	vu := VoicesUrl(lc, key)
+	vu := VoicesUrl(langCode)
 
-	resp, err := hc.Get(vu.String())
-	defer resp.Body.Close()
+	voicesReq, err := http.NewRequest(http.MethodGet, vu.String(), nil)
 	if err != nil {
 		return nil, err
 	}
+
+	voicesReq.Header.Add("X-goog-api-key", key)
+
+	resp, err := hc.Do(voicesReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return nil, errors.New(resp.Status)

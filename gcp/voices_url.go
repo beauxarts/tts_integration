@@ -4,12 +4,11 @@ import "net/url"
 
 const (
 	languageCodeParam = "languageCode"
-	keyParam          = "key"
 )
 
-func VoicesUrl(lc, key string) *url.URL {
+func VoicesUrl(langCode string) *url.URL {
 
-	if lc == "" || key == "" {
+	if langCode == "" {
 		return nil
 	}
 
@@ -20,8 +19,7 @@ func VoicesUrl(lc, key string) *url.URL {
 	}
 
 	q := u.Query()
-	q.Set(languageCodeParam, lc)
-	q.Set(keyParam, key)
+	q.Set(languageCodeParam, langCode)
 	u.RawQuery = q.Encode()
 
 	return u

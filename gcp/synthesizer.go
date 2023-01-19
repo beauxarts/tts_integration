@@ -3,7 +3,6 @@ package gcp
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/beauxarts/tts_integration"
@@ -16,11 +15,11 @@ const (
 	jsonContentType = "Content-Type: application/json"
 )
 
-type textSynthesizeResponse struct {
+type TextSynthesizeResponse struct {
 	AudioContent string `json:"audioContent"`
 }
 
-func (tsr *textSynthesizeResponse) Bytes() ([]byte, error) {
+func (tsr *TextSynthesizeResponse) Bytes() ([]byte, error) {
 	return base64.StdEncoding.DecodeString(tsr.AudioContent)
 }
 
@@ -38,62 +37,17 @@ func NewSynthesizer(hc *http.Client, key string, voiceParams ...string) tts_inte
 	}
 }
 
-func (s *Synthesizer) postText(text string) (*textSynthesizeResponse, error) {
-	return s.postSynthesizeRequest(text, tts_integration.Text)
+func (s *Synthesizer) postText(text string) (*TextSynthesizeResponse, error) {
+	return TextSynthesize(s.httpClient, text, s.voice, tts_integration.Text, s.key)
 }
 
-func (s *Synthesizer) postSSML(ssml string) (*textSynthesizeResponse, error) {
-	return s.postSynthesizeRequest(ssml, tts_integration.SSML)
-}
-
-// TODO: This needs to be reversed into a helper func that Synthesizer calls
-func (s *Synthesizer) postSynthesizeRequest(content string, contentType tts_integration.SynthesisInputType) (*textSynthesizeResponse, error) {
-
-	var newRequest func(string, *VoiceSelectionParams) *SynthesizeRequest
-	switch contentType {
-	case tts_integration.Text:
-		newRequest = NewTextSynthesizeRequest
-	case tts_integration.SSML:
-		newRequest = NewSSMLSynthesizeRequest
-	}
-
-	var sr *SynthesizeRequest
-	if newRequest != nil {
-		sr = newRequest(content, s.voice)
-	} else {
-		return nil, errors.New("unknown content type " + contentType.String())
-	}
-
-	if sr == nil {
-		return nil, errors.New("error creating synthesize request")
-	}
-
-	req, err := json.Marshal(sr)
-	if err != nil {
-		return nil, err
-	}
-
-	tsu := TextSynthesizeUrl(s.key)
-
-	resp, err := s.httpClient.Post(tsu.String(), jsonContentType, bytes.NewReader(req))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return nil, errors.New("text:synthesize error status " + resp.Status)
-	}
-
-	var tsr *textSynthesizeResponse
-	err = json.NewDecoder(resp.Body).Decode(&tsr)
-
-	return tsr, err
+func (s *Synthesizer) postSSML(ssml string) (*TextSynthesizeResponse, error) {
+	return TextSynthesize(s.httpClient, ssml, s.voice, tts_integration.SSML, s.key)
 }
 
 func (s *Synthesizer) synthesize(content string, contentType tts_integration.SynthesisInputType, w io.Writer) error {
 
-	var post func(string) (*textSynthesizeResponse, error)
+	var post func(string) (*TextSynthesizeResponse, error)
 	switch contentType {
 	case tts_integration.Text:
 		post = s.postText
