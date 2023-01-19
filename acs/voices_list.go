@@ -25,10 +25,10 @@ type VoicesListResponse struct {
 }
 
 func (vlr *VoicesListResponse) String() string {
-	return strings.Join([]string{vlr.DisplayName, vlr.Locale, vlr.Gender}, " ")
+	return strings.Join([]string{vlr.ShortName, vlr.Locale, vlr.Gender}, " ")
 }
 
-func VoicesList(hc *http.Client, region, key string) ([]*VoicesListResponse, error) {
+func VoicesList(hc *http.Client, region, token string) ([]*VoicesListResponse, error) {
 	vlu := VoicesListUrl(region)
 
 	voicesListReq, err := http.NewRequest(http.MethodGet, vlu.String(), nil)
@@ -36,7 +36,7 @@ func VoicesList(hc *http.Client, region, key string) ([]*VoicesListResponse, err
 		return nil, err
 	}
 
-	voicesListReq.Header.Add(OcpApimSubscriptionKeyHeader, key)
+	voicesListReq.Header.Add("Authorization", "Bearer "+token)
 
 	resp, err := hc.Do(voicesListReq)
 	if err != nil {

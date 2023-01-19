@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -49,7 +50,7 @@ func (vp *VoiceParams) NewSpeakData(text string) *SpeakData {
 	}
 }
 
-func (vp *VoiceParams) TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
+func (vp *VoiceParams) TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region, token string) (io.ReadCloser, error) {
 	speakData := vp.NewSpeakData(text)
 
 	data, err := xml.Marshal(speakData)
@@ -57,10 +58,10 @@ func (vp *VoiceParams) TextToSpeech(hc *http.Client, text string, audioOutput Au
 		return nil, err
 	}
 
-	return SsmlToSpeech(hc, data, audioOutput, region, key)
+	return SsmlToSpeech(hc, data, audioOutput, region, token)
 }
 
-func (vp *VoiceParams) SsmlSnippetToSpeech(hc *http.Client, ssml string, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
+func (vp *VoiceParams) SsmlContentToSpeech(hc *http.Client, ssml string, audioOutput AudioOutput, region, token string) (io.ReadCloser, error) {
 	speakData := vp.NewSpeakData("{ssml}")
 
 	data, err := xml.Marshal(speakData)
@@ -70,7 +71,7 @@ func (vp *VoiceParams) SsmlSnippetToSpeech(hc *http.Client, ssml string, audioOu
 
 	data = []byte(strings.Replace(string(data), "{ssml}", ssml, -1))
 
-	return SsmlToSpeech(hc, data, audioOutput, region, key)
+	return SsmlToSpeech(hc, data, audioOutput, region, token)
 }
 
 type SpeakData struct {
@@ -92,7 +93,7 @@ func NewSpeakData(text string, voiceParams ...string) *SpeakData {
 	}
 }
 
-func TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region, key string, voiceParams ...string) (io.ReadCloser, error) {
+func TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region, token string, voiceParams ...string) (io.ReadCloser, error) {
 
 	speakData := NewSpeakData(text, voiceParams...)
 
@@ -101,11 +102,13 @@ func TextToSpeech(hc *http.Client, text string, audioOutput AudioOutput, region,
 		return nil, err
 	}
 
-	return SsmlToSpeech(hc, data, audioOutput, region, key)
+	return SsmlToSpeech(hc, data, audioOutput, region, token)
 }
 
-func SsmlToSpeech(hc *http.Client, ssml []byte, audioOutput AudioOutput, region, key string) (io.ReadCloser, error) {
+func SsmlToSpeech(hc *http.Client, ssml []byte, audioOutput AudioOutput, region, token string) (io.ReadCloser, error) {
 	ttsu := TextToSpeechUrl(region)
+
+	fmt.Println(ttsu)
 
 	ttsReq, err := http.NewRequest(http.MethodPost, ttsu.String(), bytes.NewReader(ssml))
 	if err != nil {
@@ -114,7 +117,7 @@ func SsmlToSpeech(hc *http.Client, ssml []byte, audioOutput AudioOutput, region,
 
 	ttsReq.Header.Add("X-Microsoft-OutputFormat", audioOutput.String())
 	ttsReq.Header.Add("Content-Type", applicationSsmlXml)
-	ttsReq.Header.Add(OcpApimSubscriptionKeyHeader, key)
+	ttsReq.Header.Add("Authorization", "Bearer "+token)
 
 	resp, err := hc.Do(ttsReq)
 	if err != nil {
