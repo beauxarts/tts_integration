@@ -1,39 +1,16 @@
-# google-tts-integration
-Tiny Google Client Text-to-Speech integration module. 
+# tts-integration
+Tiny Cloud and local services text-to-speech integration module. 
 
-Most likely you would be better served by an official module `cloud.google.com/go/texttospeech/apiv1`.
+For cloud versions - most likely you would be better served by official modules:
+  - `gcp`: `cloud.google.com/go/texttospeech/apiv1`
+  - `acs`: `github.com/Microsoft/cognitive-services-speech-sdk-go`
 
 ## How to use
 
-Add module to your project: `go get github.com/beauxarts/google-tts-integration`.
+Add module to your project: `go get github.com/beauxarts/tts-integration`.
 
-## Prerequisites
+## Usage
 
-- Create (or use existing) project on Google Cloud Console
-- Enable `texttospeech.googleapis.com` API
-- Navigate to the the `API` > `Credentials` section:
-  - Create an API key
-  - Create a service account (source: https://cloud.google.com/text-to-speech/docs/create-audio-text-client-libraries)
+This package defines a common `Synthesizer` interface ([source](https://github.com/beauxarts/tts_integration/blob/main/synthesizer.go)), that is realized with `gcp` (Google Cloud), `acs` (Azure Cognitive Services), `say` (macOS say command).
 
-## Getting available voices for a locale
-
-NOTE: error handling omitted for brevity.
-
-```go
-//key := "Text-to-speech API key"
-voices, _ := google_tts_integration.GetVoices(http.DefaultClient, "en-US", key)
-```
-
-## Synthesizing audio from text
-
-NOTE: error handling omitted for brevity.
-
-```go
-//key := "Text-to-speech API key"
-text := "Hello, World!" //The input size is limited to 5000 characters.
-voice := google_tts_integration.NewVoiceSelectionParams("en-US", "en-US-WaveNet-A", google_tts_integration.Male)
-
-tsr, _ := google_tts_integration.PostTextSynthesize(http.DefaultClient, text, voice, key)
-
-//tsr.Bytes() is an OggOpus encoded audio (default format used by this module)
-```
+[lego](https://github.com/beauxarts/lego) is a reference implementation of the `Synthesizer` and provider specifics ([source](https://github.com/beauxarts/lego/blob/main/chapter_paragraph/synthesizer.go)). 
